@@ -1,7 +1,7 @@
 #!./perl
 
 #
-# $Id: normal.t,v 0.1.1.2 2001/04/11 16:00:55 ram Exp $
+# $Id: normal.t,v 1.1 2002/05/12 17:33:43 wendigo Exp $
 #
 #  Copyright (c) 2000, Raphael Manfredi
 #  
@@ -10,6 +10,9 @@
 #
 # HISTORY
 # $Log: normal.t,v $
+# Revision 1.1  2002/05/12 17:33:43  wendigo
+# Initial revision
+#
 # Revision 0.1.1.2  2001/04/11 16:00:55  ram
 # patch3: ensure logfile rotation indication is left properly
 #

@@ -1,7 +1,7 @@
 #!./perl
 
 #
-# $Id: badconf.t,v 0.1.1.1 2000/11/06 20:04:10 ram Exp $
+# $Id: badconf.t,v 1.1 2002/05/12 17:33:43 wendigo Exp $
 #
 #  Copyright (c) 2000, Raphael Manfredi
 #  
@@ -10,6 +10,9 @@
 #
 # HISTORY
 # $Log: badconf.t,v $
+# Revision 1.1  2002/05/12 17:33:43  wendigo
+# Initial revision
+#
 # Revision 0.1.1.1  2000/11/06 20:04:10  ram
 # patch1: updated test to new logic
 #

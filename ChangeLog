@@ -1,3 +1,12 @@
+Tue May 14 01:00:12 EDT 2002    Mark Rogaski <mrogaski@cpan.org>
+
+. Description:
+
+        Version 0.1.4.
+
+        Allow restriction of file permissions with -file_perm
+        argument to Log::Agent::Rotate->make().
+
 Wed Apr 11 18:01:46 MEST 2001   Raphael Manfredi <Raphael_Manfredi@pobox.com>
 
 . Description:

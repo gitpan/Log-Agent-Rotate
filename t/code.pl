@@ -1,5 +1,5 @@
 #
-# $Id: code.pl,v 0.1 2000/03/05 22:15:40 ram Exp $
+# $Id: code.pl,v 1.1 2002/05/12 17:33:43 wendigo Exp $
 #
 #  Copyright (c) 2000, Raphael Manfredi
 #  
@@ -8,6 +8,9 @@
 #
 # HISTORY
 # $Log: code.pl,v $
+# Revision 1.1  2002/05/12 17:33:43  wendigo
+# Initial revision
+#
 # Revision 0.1  2000/03/05 22:15:40  ram
 # Baseline for first alpha release.
 #

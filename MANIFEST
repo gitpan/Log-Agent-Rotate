@@ -10,4 +10,5 @@ t/code.pl                        Library for tests
 t/hole.t                         Test holes in logfile sequence
 t/mixed.t                        Test mixed rotation policy
 t/normal.t                       Test normal configuration
+t/perm.t                         Test file permission behavior
 t/rename.t                       Test behaviour with external logfile renaming

@@ -1,4 +1,4 @@
-# $Id: Makefile.PL,v 0.1.1.3 2001/04/11 15:58:55 ram Exp $
+# $Id: Makefile.PL,v 1.1 2002/05/12 17:33:43 wendigo Exp $
 #
 #  Copyright (c) 2000, Raphael Manfredi
 #  
@@ -7,6 +7,9 @@
 #
 # HISTORY
 # $Log: Makefile.PL,v $
+# Revision 1.1  2002/05/12 17:33:43  wendigo
+# Initial revision
+#
 # Revision 0.1.1.3  2001/04/11 15:58:55  ram
 # patch3: now depends on Getargs::Long
 #

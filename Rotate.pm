@@ -1,13 +1,34 @@
+###########################################################################
+# $Id: Rotate.pm,v 1.5 2002/05/14 05:15:30 wendigo Exp $
+###########################################################################
 #
-# $Id: Rotate.pm,v 0.1.1.3 2001/04/11 16:00:29 ram Exp $
+# Log::Agent::Rotate
 #
-#  Copyright (c) 2000, Raphael Manfredi
-#  
-#  You may redistribute only under the terms of the Artistic License,
-#  as specified in the README file that comes with the distribution.
-#  
-# HISTORY
+# RCS Revision: $Revision: 1.5 $
+# Date: $Date: 2002/05/14 05:15:30 $
+#
+# Copyright (c) 2000 Raphael Manfredi.
+# Copyright (c) 2002 Mark Rogaski, mrogaski@cpan.org; all rights reserved.
+#
+# See the README file included with the
+# distribution for license information.
+#
 # $Log: Rotate.pm,v $
+# Revision 1.5  2002/05/14 05:15:30  wendigo
+# updated POD
+#
+# Revision 1.4  2002/05/14 04:58:28  wendigo
+# corrected $VERSION
+#
+# Revision 1.3  2002/05/14 04:49:49  wendigo
+# modified version control
+#
+# Revision 1.2  2002/05/14 04:47:21  wendigo
+# added file_perm argument
+#
+# Revision 1.1  2002/05/12 17:33:43  wendigo
+# Initial revision
+#
 # Revision 0.1.1.3  2001/04/11 16:00:29  ram
 # patch3: switched to Getargs::Long for argument parsing
 # patch3: updated version number
@@ -23,12 +44,11 @@
 # Revision 0.1  2000/03/05 22:15:40  ram
 # Baseline for first alpha release.
 #
-# $EndLog$
-#
+###########################################################################
 
 use strict;
 
-########################################################################
+###########################################################################
 package Log::Agent::Rotate;
 
 use Getargs::Long qw(ignorecase);
@@ -39,16 +59,17 @@ use Getargs::Long qw(ignorecase);
 
 use vars qw($VERSION);
 
-$VERSION = '0.103';
+$VERSION = sprintf "%d.%01d%02d%s", '$Name: rel0_1_4 $' =~ /(p?\d+)/g;
 
 BEGIN {
-	sub BACKLOG ()		{0}
-	sub UNZIPPED ()		{1}
-	sub MAX_SIZE ()		{2}
-	sub MAX_WRITE ()	{3}
-	sub MAX_TIME ()		{4}
-	sub IS_ALONE ()		{5}
-	sub SINGLE_HOST ()	{6}
+    sub BACKLOG ()     {0}
+    sub UNZIPPED ()    {1}
+    sub MAX_SIZE ()    {2}
+    sub MAX_WRITE ()   {3}
+    sub MAX_TIME ()    {4}
+    sub IS_ALONE ()    {5}
+    sub SINGLE_HOST () {6}
+    sub FILE_PERM ()   {7}
 }
 
 #
@@ -66,30 +87,32 @@ BEGIN {
 #   single_host   hint: access to logfiles always made via one host
 #
 sub make {
-	my $self = bless [], shift;
+    my $self = bless [], shift;
 
-	(
-		$self->[BACKLOG],
-		$self->[UNZIPPED],
-		$self->[MAX_SIZE],
-		$self->[MAX_WRITE],
-		$self->[MAX_TIME],
-		$self->[IS_ALONE],
-		$self->[SINGLE_HOST]
-	) = xgetargs(@_,
-		-backlog		=> ['i', 7],
-		-unzipped		=> ['i', 1],
-		-max_size		=> ['i', 1_048_576],
-		-max_write		=> ['i', 0],
-		-max_time		=> ['s', "0"],
-		-is_alone		=> ['i', 0],
-		-single_host	=> ['i', 0],
-	);
+    (
+        $self->[BACKLOG],
+        $self->[UNZIPPED],
+        $self->[MAX_SIZE],
+        $self->[MAX_WRITE],
+        $self->[MAX_TIME],
+        $self->[IS_ALONE],
+        $self->[SINGLE_HOST],
+        $self->[FILE_PERM]
+    ) = xgetargs(@_,
+        -backlog        => ['i', 7],
+        -unzipped       => ['i', 1],
+        -max_size       => ['i', 1_048_576],
+        -max_write      => ['i', 0],
+        -max_time       => ['s', "0"],
+        -is_alone       => ['i', 0],
+        -single_host    => ['i', 0],
+        -file_perm      => ['i', 0666]
+    );
 
-	$self->[MAX_TIME] = seconds_in_period($self->[MAX_TIME])
-		if $self->[MAX_TIME];
+    $self->[MAX_TIME] = seconds_in_period($self->[MAX_TIME])
+            if $self->[MAX_TIME];
 
-	return $self;
+    return $self;
 }
 
 #
@@ -98,44 +121,45 @@ sub make {
 # Converts a period into a number of seconds.
 #
 sub seconds_in_period {
-	my ($p) = @_;
+    my ($p) = @_;
 
-	$p =~ s|^(\d+)||;
-	my $base = int($1);			# Number of elementary periods
-	my $u = "s";				# Default Unit
-	$u = substr($1, 0, 1) if $p =~ /^\s*(\w+)$/;
-	my $sec;
+    $p =~ s|^(\d+)||;
+    my $base = int($1); # Number of elementary periods
+    my $u = "s";        # Default Unit
+    $u = substr($1, 0, 1) if $p =~ /^\s*(\w+)$/;
+    my $sec;
 
-	if ($u eq 'm') {
-		$sec = 60;				# One minute = 60 seconds
-	} elsif ($u eq 'h') {
-		$sec = 3600;			# One hour = 3600 seconds
-	} elsif ($u eq 'd') {
-		$sec = 86400;			# One day = 24 hours
-	} elsif ($u eq 'w') {
-		$sec = 604800;			# One week = 7 days
-	} elsif ($u eq 'M') {
-		$sec = 2592000;			# One month = 30 days
-	} elsif ($u eq 'y') {
-		$sec = 31536000;		# One year = 365 days
-	} else {
-		$sec = 1;				# Unrecognized: defaults to seconds
-	}
+    if ($u eq 'm') {
+        $sec = 60;              # One minute = 60 seconds
+    } elsif ($u eq 'h') {
+        $sec = 3600;            # One hour = 3600 seconds
+    } elsif ($u eq 'd') {
+        $sec = 86400;           # One day = 24 hours
+    } elsif ($u eq 'w') {
+        $sec = 604800;          # One week = 7 days
+    } elsif ($u eq 'M') {
+        $sec = 2592000;         # One month = 30 days
+    } elsif ($u eq 'y') {
+        $sec = 31536000;        # One year = 365 days
+    } else {
+        $sec = 1;               # Unrecognized: defaults to seconds
+    }
 
-	return $base * $sec;
+    return $base * $sec;
 }
 
 #
 # Attribute access
 #
 
-sub backlog		{ $_[0]->[BACKLOG] }
-sub unzipped	{ $_[0]->[UNZIPPED] }
-sub max_size	{ $_[0]->[MAX_SIZE] }
-sub max_write	{ $_[0]->[MAX_WRITE] }
-sub max_time	{ $_[0]->[MAX_TIME] }
-sub is_alone	{ $_[0]->[IS_ALONE] }
-sub single_host	{ $_[0]->[SINGLE_HOST] }
+sub backlog     { $_[0]->[BACKLOG] }
+sub unzipped    { $_[0]->[UNZIPPED] }
+sub max_size    { $_[0]->[MAX_SIZE] }
+sub max_write   { $_[0]->[MAX_WRITE] }
+sub max_time    { $_[0]->[MAX_TIME] }
+sub is_alone    { $_[0]->[IS_ALONE] }
+sub single_host { $_[0]->[SINGLE_HOST] }
+sub file_perm   { $_[0]->[FILE_PERM] }
 
 #
 # There's no set_xxx() routines: those objects are passed by reference and
@@ -149,15 +173,15 @@ sub single_host	{ $_[0]->[SINGLE_HOST] }
 # Compare settings of $self with that of $other
 #
 sub is_same {
-	my $self = shift;
-	my ($other) = @_;
-	for (my $i = 0; $i < @$self; $i++) {
-		return 0 if $self->[$i] != $other->[$i];
-	}
-	return 1;
+    my $self = shift;
+    my ($other) = @_;
+    for (my $i = 0; $i < @$self; $i++) {
+        return 0 if $self->[$i] != $other->[$i];
+    }
+    return 1;
 }
 
-1;	# for require
+1;        # for require
 __END__
 
 =head1 NAME
@@ -169,11 +193,12 @@ Log::Agent::Rotate - parameters for logfile rotation
  require Log::Agent::Rotate;
 
  my $policy = Log::Agent::Rotate->make(
-	 -backlog     => 7,
-	 -unzipped    => 2,
-	 -is_alone    => 0,
-	 -max_size    => 100_000,
-	 -max_time    => "1w",
+     -backlog     => 7,
+     -unzipped    => 2,
+     -is_alone    => 0,
+     -max_size    => 100_000,
+     -max_time    => "1w",
+     -file_perm   => 0666
  );
 
 =head1 DESCRIPTION
@@ -207,6 +232,16 @@ listed in alphabetical order, all taking a single integer value as argument:
 The total amount of old logfiles to keep, besides the current logfile.
 
 Defaults to 7.
+
+=item I<file_perm>
+
+The file permissions, given as an octal integer value, to supply to
+sysopen() during file creation.  This value is modified during execution
+by the umask of the process.  In most cases, it is good practice to leave
+this set to the default and let the user process controll the file
+permissions.
+
+Defaults to 0666.
 
 =item I<is_alone>
 
@@ -282,7 +317,7 @@ as in:
 
 where both $x and $y are C<Log::Agent::Rotate> objects.
 
-All the aforementionned switches also have a corresponding querying
+All the aforementioned switches also have a corresponding querying
 routine that can be issued on instances of the class to get their value.
 It is not possible to modify those attributes.
 
@@ -293,9 +328,12 @@ For instance:
 
 would get the configured I<max_write> threshold.
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Raphael Manfredi F<E<lt>Raphael_Manfredi@pobox.comE<gt>>
+Originally written by Raphael Manfredi E<lt>Raphael_Manfredi@pobox.comE<gt>,
+currently maintained by Mark Rogaski E<lt>mrogaski@cpan.orgE<gt>.
+
+Thanks to Chris Meshkin for his suggestions on file permissions.
 
 =head1 SEE ALSO
 
@@ -303,3 +341,4 @@ Log::Agent(3), Log::Agent::Driver::File(3),
 Log::Agent::Rotate::File(3).
 
 =cut
+
