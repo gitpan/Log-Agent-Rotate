@@ -1,5 +1,5 @@
 #
-# $Id: Rotate.pm,v 0.1.1.1 2000/11/06 20:03:35 ram Exp $
+# $Id: Rotate.pm,v 0.1.1.2 2000/11/12 14:54:10 ram Exp $
 #
 #  Copyright (c) 2000, Raphael Manfredi
 #  
@@ -8,6 +8,9 @@
 #  
 # HISTORY
 # $Log: Rotate.pm,v $
+# Revision 0.1.1.2  2000/11/12 14:54:10  ram
+# patch2: new -single_host parameter
+#
 # Revision 0.1.1.1  2000/11/06 20:03:35  ram
 # patch1: moved to an array representation for the object
 # patch1: added ability to specify -max_time in other units than seconds
@@ -30,7 +33,7 @@ package Log::Agent::Rotate;
 
 use vars qw($VERSION);
 
-$VERSION = '0.101';
+$VERSION = '0.102';
 
 BEGIN {
 	sub BACKLOG ()		{0}
@@ -39,6 +42,7 @@ BEGIN {
 	sub MAX_WRITE ()	{3}
 	sub MAX_TIME ()		{4}
 	sub IS_ALONE ()		{5}
+	sub SINGLE_HOST ()	{6}
 }
 
 #
@@ -53,18 +57,20 @@ BEGIN {
 #   max_write     maximum amount of bytes to write in file
 #   max_time      maximum amount of time to keep open
 #   is_alone      hint: only one instance is busy manipulating the logfiles
+#   single_host   hint: access to logfiles always made via one host
 #
 sub make {
 	my $self = bless [], shift;
 	my (%args) = @_;
 
 	my %set = (
-		-backlog	=> \$self->[BACKLOG],
-		-unzipped	=> \$self->[UNZIPPED],
-		-max_size	=> \$self->[MAX_SIZE],
-		-max_write	=> \$self->[MAX_WRITE],
-		-max_time	=> \$self->[MAX_TIME],
-		-is_alone	=> \$self->[IS_ALONE],
+		-backlog		=> \$self->[BACKLOG],
+		-unzipped		=> \$self->[UNZIPPED],
+		-max_size		=> \$self->[MAX_SIZE],
+		-max_write		=> \$self->[MAX_WRITE],
+		-max_time		=> \$self->[MAX_TIME],
+		-is_alone		=> \$self->[IS_ALONE],
+		-single_host	=> \$self->[SINGLE_HOST],
 	);
 
 	while (my ($arg, $val) = each %args) {
@@ -80,12 +86,13 @@ sub make {
 	# Setup default values.
 	#
 
-	$self->[BACKLOG]	= 7			unless defined $self->[BACKLOG];
-	$self->[UNZIPPED]	= 1			unless defined $self->[UNZIPPED];
-	$self->[MAX_SIZE]	= 1_048_576	unless defined $self->[MAX_SIZE];
-	$self->[MAX_WRITE]	= 0			unless defined $self->[MAX_WRITE];
-	$self->[MAX_TIME]	= 0			unless defined $self->[MAX_TIME];
-	$self->[IS_ALONE]	= 0			unless defined $self->[IS_ALONE];
+	$self->[BACKLOG]     = 7			unless defined $self->[BACKLOG];
+	$self->[UNZIPPED]    = 1			unless defined $self->[UNZIPPED];
+	$self->[MAX_SIZE]    = 1_048_576	unless defined $self->[MAX_SIZE];
+	$self->[MAX_WRITE]   = 0			unless defined $self->[MAX_WRITE];
+	$self->[MAX_TIME]    = 0			unless defined $self->[MAX_TIME];
+	$self->[IS_ALONE]    = 0			unless defined $self->[IS_ALONE];
+	$self->[SINGLE_HOST] = 0			unless defined $self->[SINGLE_HOST];
 
 	$self->[MAX_TIME] = seconds_in_period($self->[MAX_TIME])
 		if $self->[MAX_TIME];
@@ -136,6 +143,7 @@ sub max_size	{ $_[0]->[MAX_SIZE] }
 sub max_write	{ $_[0]->[MAX_WRITE] }
 sub max_time	{ $_[0]->[MAX_TIME] }
 sub is_alone	{ $_[0]->[IS_ALONE] }
+sub single_host	{ $_[0]->[SINGLE_HOST] }
 
 #
 # There's no set_xxx() routines: those objects are passed by reference and
@@ -256,6 +264,15 @@ at all if none of the programs write at least C<max_write> bytes to the
 logfile before exiting.
 
 Defaults to C<0>, meaning it is not checked.
+
+=item I<single_host>
+
+The argument is a boolean stating whether the access to the logfiles
+will be made from one single host or not.  This is a hint that drives some
+optimizations, but it is up to the program to B<guarantee> that it is
+accurately set.
+
+Defaults to I<false>, which is always a safe value.
 
 =item I<unzipped>
 

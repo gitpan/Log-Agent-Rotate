@@ -1,5 +1,5 @@
 #
-# $Id: Rotate.pm,v 0.1.1.1 2000/11/06 19:57:24 ram Exp $
+# $Id: Rotate.pm,v 0.1.1.2 2000/11/12 14:53:27 ram Exp $
 #
 #  Copyright (c) 2000, Raphael Manfredi
 #  
@@ -8,6 +8,10 @@
 #  
 # HISTORY
 # $Log: Rotate.pm,v $
+# Revision 0.1.1.2  2000/11/12 14:53:27  ram
+# patch2: untaint data read or rename() complains under -T
+# patch2: use new -single_host parameter to configure LockFile::Simple
+#
 # Revision 0.1.1.1  2000/11/06 19:57:24  ram
 # patch1: removed reference on driver
 #
@@ -73,7 +77,7 @@ sub make {
 			-efunc		=> undef,
 			-hold		=> 60,
 			-max		=> 5,
-			-nfs		=> 1,
+			-nfs		=> !$config->single_host,
 			-stale		=> 1,
 			-warn		=> 0,
 			-wfunc		=> undef,
@@ -110,7 +114,7 @@ sub rotating	{ $_[0]->{'rotating'} }
 #
 sub print {
 	my $self = shift;
-	my ($str) = join('', @_);
+	my $str = join('', @_);
 
 	my $fd = $self->fd;
 	my $cf = $self->config;
@@ -131,8 +135,6 @@ sub print {
 
 	#
 	# Open file if not already done.
-	# Can't log errors via Log::Agent since we might recurse down here.
-	# Therefore, use warn(), but only once.
 	#
 
 	unless (defined $fd) {
@@ -205,6 +207,12 @@ sub open {
 	warn "opening $path\n" if $DEBUG;
 
 	unless (sysopen($fd, $path, O_CREAT|O_APPEND|O_WRONLY)) {
+		#
+		# Can't log errors via Log::Agent since we might recurse down here.
+		# Therefore, use warn(), but only once, and clear condition when
+		# opening is successful.
+		#
+
 		warn "$0: can't open logfile \"$path\": $!\n"
 			unless $self->warned->{$path}++;
 		return;
@@ -258,7 +266,8 @@ sub rotate {
 	# recurse down here since we're protected by the `rotating' flag.
 	#
 
-	logerr "while rotating logfiles:";
+	my $error = @errors == 1 ? "error" : sprintf("%d errors", scalar @errors);
+	logerr "the following $error occurred while rotating logfiles:";
 	foreach my $err (@errors) {
 		logerr $err;
 		warn "ERROR: $err\n" if $DEBUG;
@@ -280,6 +289,16 @@ sub do_rotate {
 	my $lock = $self->lockmgr->lock($path);
 
 	#
+	# Emission of errors has to be delayed, since we're in the middle of
+	# logfile rotation, which could be the error channel.
+	#
+
+	my @errors = ();
+
+	push(@errors, "proceeded with rotation of $path without lock")
+		unless defined $lock;
+
+	#
 	# We're unix-centric in the following code fragment, but I don't know
 	# how to do the same thing on non-unix operating systems.  Sorry.
 	#
@@ -290,7 +309,7 @@ sub do_rotate {
 	local *DIR;
 	unless (opendir(DIR, $dir)) {
 		my $error = "can't open directory \"$dir\" to rotate $path: $!";
-		$lock->release;
+		$lock->release if defined $lock;
 		return ($error);
 	}
 	my @files = readdir DIR;
@@ -316,6 +335,7 @@ sub do_rotate {
 		my ($idx) = ($f =~ /\.(\d+)(?:\.gz)?$/);
 		warn "f=$f, idx=$idx\n" if $DEBUG;
 		next unless defined $idx;
+		$f = $1 if $f =~ /^(.*)$/;	# untaint
 		if ($idx >= $unlink_at) {
 			push(@unlink, $f);
 		} else {
@@ -331,8 +351,6 @@ sub do_rotate {
 	#
 	# Delete old files, if any.
 	#
-
-	my @errors = ();
 
 	foreach my $f (@unlink) {
 		unlink("$dir/$f") or push(@errors, "can't unlink $dir/$f: $!");
@@ -428,7 +446,7 @@ sub do_rotate {
 	# Unlock logfile and propagate errors to be logged in new current file.
 	#
 
-	$lock->release;
+	$lock->release if defined $lock;
 	return @errors if @errors;
 	return;
 }

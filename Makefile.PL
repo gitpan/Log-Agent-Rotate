@@ -1,4 +1,4 @@
-# $Id: Makefile.PL,v 0.1.1.1 2000/11/06 19:57:50 ram Exp $
+# $Id: Makefile.PL,v 0.1.1.2 2000/11/12 14:53:38 ram Exp $
 #
 #  Copyright (c) 2000, Raphael Manfredi
 #  
@@ -7,6 +7,9 @@
 #
 # HISTORY
 # $Log: Makefile.PL,v $
+# Revision 0.1.1.2  2000/11/12 14:53:38  ram
+# patch2: changed pre-req on Log::Agent
+#
 # Revision 0.1.1.1  2000/11/06 19:57:50  ram
 # patch1: added build_pm_hash() to compute PM value from MANIFEST
 #
@@ -25,7 +28,7 @@ WriteMakefile(
 	'PREREQ_PM' => {
 		'LockFile::Simple' => '0.202',
 		'Compress::Zlib'   => '0.4',
-		'Log::Agent'       => '0.200',
+		'Log::Agent'       => '0.201',
 	},
 	'PM' => build_pm_hash(),
     'LIBS'	=> [''],		# e.g., '-lm' 

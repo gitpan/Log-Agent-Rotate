@@ -17,7 +17,7 @@
 Name           DSLI  Description                                  Info
 -----------    ----  -------------------------------------------- -----
 Log::Agent     ----  A general logging framework                  RAM
-::Rotate       adpO  Logfile rotation config and handler          RAM
+::Rotate       adpO  Logfile rotation config and support          RAM
 
 
 The Log::Agent::Rotate module is an extension of Log::Agent that brings

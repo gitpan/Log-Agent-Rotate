@@ -1,7 +1,7 @@
 #!./perl
 
 #
-# $Id: normal.t,v 0.1 2000/03/05 22:15:41 ram Exp $
+# $Id: normal.t,v 0.1.1.1 2000/11/12 14:54:26 ram Exp $
 #
 #  Copyright (c) 2000, Raphael Manfredi
 #  
@@ -10,6 +10,9 @@
 #
 # HISTORY
 # $Log: normal.t,v $
+# Revision 0.1.1.1  2000/11/12 14:54:26  ram
+# patch2: use new -single_host parameter
+#
 # Revision 0.1  2000/03/05 22:15:41  ram
 # Baseline for first alpha release.
 #
@@ -37,6 +40,7 @@ my $rotate_dflt = Log::Agent::Rotate->make(
 	-backlog     => 7,
 	-unzipped    => 2,
 	-is_alone    => 1,
+	-single_host => 1,
     -max_size    => 100,
 );
 

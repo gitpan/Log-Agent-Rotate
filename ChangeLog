@@ -1,3 +1,18 @@
+Sun Nov 12 15:56:22 MET 2000   Raphael Manfredi <Raphael_Manfredi@pobox.com>
+
+. Description:
+
+	Version 0.1.2.
+
+	Untaint data read or rename() complains under -T.
+
+	Changed pre-req on Log::Agent: must now use 0.2.1.
+	Changed DLSI description to match CPAN's
+
+	New -single_host parameter is used to optimize LockFile::Simple:
+	we don't supply -nfs when -single_host is true, for faster
+	locking procedure.
+
 Mon Nov  6 21:06:22 MET 2000   Raphael Manfredi <Raphael_Manfredi@pobox.com>
 
 . Description:
