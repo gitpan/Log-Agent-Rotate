@@ -1,4 +1,4 @@
-# $Id: Makefile.PL,v 0.1.1.2 2000/11/12 14:53:38 ram Exp $
+# $Id: Makefile.PL,v 0.1.1.3 2001/04/11 15:58:55 ram Exp $
 #
 #  Copyright (c) 2000, Raphael Manfredi
 #  
@@ -7,6 +7,9 @@
 #
 # HISTORY
 # $Log: Makefile.PL,v $
+# Revision 0.1.1.3  2001/04/11 15:58:55  ram
+# patch3: now depends on Getargs::Long
+#
 # Revision 0.1.1.2  2000/11/12 14:53:38  ram
 # patch2: changed pre-req on Log::Agent
 #
@@ -26,8 +29,9 @@ WriteMakefile(
     'NAME'	=> 'Log::Agent::Rotate',
     'VERSION_FROM' => 'Rotate.pm', # finds $VERSION
 	'PREREQ_PM' => {
-		'LockFile::Simple' => '0.202',
 		'Compress::Zlib'   => '0.4',
+		'Getargs::Long'    => '0.103',
+		'LockFile::Simple' => '0.202',
 		'Log::Agent'       => '0.201',
 	},
 	'PM' => build_pm_hash(),

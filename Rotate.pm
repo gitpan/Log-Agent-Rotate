@@ -1,5 +1,5 @@
 #
-# $Id: Rotate.pm,v 0.1.1.2 2000/11/12 14:54:10 ram Exp $
+# $Id: Rotate.pm,v 0.1.1.3 2001/04/11 16:00:29 ram Exp $
 #
 #  Copyright (c) 2000, Raphael Manfredi
 #  
@@ -8,6 +8,10 @@
 #  
 # HISTORY
 # $Log: Rotate.pm,v $
+# Revision 0.1.1.3  2001/04/11 16:00:29  ram
+# patch3: switched to Getargs::Long for argument parsing
+# patch3: updated version number
+#
 # Revision 0.1.1.2  2000/11/12 14:54:10  ram
 # patch2: new -single_host parameter
 #
@@ -27,13 +31,15 @@ use strict;
 ########################################################################
 package Log::Agent::Rotate;
 
+use Getargs::Long qw(ignorecase);
+
 #
 # File rotating policy
 #
 
 use vars qw($VERSION);
 
-$VERSION = '0.102';
+$VERSION = '0.103';
 
 BEGIN {
 	sub BACKLOG ()		{0}
@@ -61,38 +67,24 @@ BEGIN {
 #
 sub make {
 	my $self = bless [], shift;
-	my (%args) = @_;
 
-	my %set = (
-		-backlog		=> \$self->[BACKLOG],
-		-unzipped		=> \$self->[UNZIPPED],
-		-max_size		=> \$self->[MAX_SIZE],
-		-max_write		=> \$self->[MAX_WRITE],
-		-max_time		=> \$self->[MAX_TIME],
-		-is_alone		=> \$self->[IS_ALONE],
-		-single_host	=> \$self->[SINGLE_HOST],
+	(
+		$self->[BACKLOG],
+		$self->[UNZIPPED],
+		$self->[MAX_SIZE],
+		$self->[MAX_WRITE],
+		$self->[MAX_TIME],
+		$self->[IS_ALONE],
+		$self->[SINGLE_HOST]
+	) = xgetargs(@_,
+		-backlog		=> ['i', 7],
+		-unzipped		=> ['i', 1],
+		-max_size		=> ['i', 1_048_576],
+		-max_write		=> ['i', 0],
+		-max_time		=> ['s', "0"],
+		-is_alone		=> ['i', 0],
+		-single_host	=> ['i', 0],
 	);
-
-	while (my ($arg, $val) = each %args) {
-		my $vset = $set{lc($arg)};
-		unless (ref $vset) {
-			require Carp;
-			Carp::croak("Unknown switch $arg");
-		}
-		$$vset = $val;
-	}
-
-	#
-	# Setup default values.
-	#
-
-	$self->[BACKLOG]     = 7			unless defined $self->[BACKLOG];
-	$self->[UNZIPPED]    = 1			unless defined $self->[UNZIPPED];
-	$self->[MAX_SIZE]    = 1_048_576	unless defined $self->[MAX_SIZE];
-	$self->[MAX_WRITE]   = 0			unless defined $self->[MAX_WRITE];
-	$self->[MAX_TIME]    = 0			unless defined $self->[MAX_TIME];
-	$self->[IS_ALONE]    = 0			unless defined $self->[IS_ALONE];
-	$self->[SINGLE_HOST] = 0			unless defined $self->[SINGLE_HOST];
 
 	$self->[MAX_TIME] = seconds_in_period($self->[MAX_TIME])
 		if $self->[MAX_TIME];
@@ -208,7 +200,7 @@ are not compressed, the following files can be present on the filesystem:
 The following I<switches> are available to the creation routine make(),
 listed in alphabetical order, all taking a single integer value as argument:
 
-=over
+=over 4
 
 =item I<backlog>
 

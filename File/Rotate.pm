@@ -1,5 +1,5 @@
 #
-# $Id: Rotate.pm,v 0.1.1.2 2000/11/12 14:53:27 ram Exp $
+# $Id: Rotate.pm,v 0.1.1.3 2001/04/11 15:58:34 ram Exp $
 #
 #  Copyright (c) 2000, Raphael Manfredi
 #  
@@ -8,6 +8,9 @@
 #  
 # HISTORY
 # $Log: Rotate.pm,v $
+# Revision 0.1.1.3  2001/04/11 15:58:34  ram
+# patch3: mark rotation in the logfile before rotating it
+#
 # Revision 0.1.1.2  2000/11/12 14:53:27  ram
 # patch2: untaint data read or rename() complains under -T
 # patch2: use new -single_host parameter to configure LockFile::Simple
@@ -430,6 +433,13 @@ sub do_rotate {
 	}
 
 	#
+	# Mark rotation, in case they "tail -f" on it.
+	#
+
+	my $fd = $self->fd;
+	syswrite($fd, "*** LOGFILE ROTATED ON " . scalar(localtime) . "\n");
+
+	#
 	# Finally, close current logfile and rename it.
 	#
 
@@ -523,9 +533,16 @@ a single C<print> routine, just like C<Log::Agent::File::Native>.
 Internally, it uses the parameters given by a C<Log::Agent::Rotate> object
 to transparently close the current logfile and cycle the older logs.
 
+Before rotating the current logfile, the string:
+
+    *** LOGFILE ROTATED ON <local date>
+
+is emitted, so that people monitoring the file via "tail -f" know about
+it and are not surprised by the sudden stop of messages.
+
 Its exported interface is:
 
-=over
+=over 4
 
 =item make I<file>, I<config>
 

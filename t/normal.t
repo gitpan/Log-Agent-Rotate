@@ -1,7 +1,7 @@
 #!./perl
 
 #
-# $Id: normal.t,v 0.1.1.1 2000/11/12 14:54:26 ram Exp $
+# $Id: normal.t,v 0.1.1.2 2001/04/11 16:00:55 ram Exp $
 #
 #  Copyright (c) 2000, Raphael Manfredi
 #  
@@ -10,6 +10,9 @@
 #
 # HISTORY
 # $Log: normal.t,v $
+# Revision 0.1.1.2  2001/04/11 16:00:55  ram
+# patch3: ensure logfile rotation indication is left properly
+#
 # Revision 0.1.1.1  2000/11/12 14:54:26  ram
 # patch2: use new -single_host parameter
 #
@@ -22,7 +25,7 @@
 #
 # Check normal behaviour, with 2 non-compressed files
 #
-print "1..20\n";
+print "1..21\n";
 
 require 't/code.pl';
 sub ok;
@@ -101,6 +104,7 @@ logsay $message;		# rotates again, sill no logfile.7.gz
 
 ok 19, -e("t/logfile.6.gz");
 ok 20, !-e("t/logfile.7.gz");
+ok 21, contains("t/logfile.0", "LOGFILE ROTATED ON");
 
 cleanlog;
 

@@ -1,3 +1,13 @@
+Wed Apr 11 18:01:46 MEST 2001   Raphael Manfredi <Raphael_Manfredi@pobox.com>
+
+. Description:
+
+	Mark rotation in the logfile before rotating it, so that
+	any pending "tail -f" gets to know about it.  Added a
+	regression test for it.
+
+	Now depends on Getargs::Long for argument parsing.
+
 Sun Nov 12 15:56:22 MET 2000   Raphael Manfredi <Raphael_Manfredi@pobox.com>
 
 . Description:
