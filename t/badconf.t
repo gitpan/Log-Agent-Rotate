@@ -1,7 +1,7 @@
 #!./perl
 
 #
-# $Id: badconf.t,v 0.1 2000/03/05 22:15:40 ram Exp $
+# $Id: badconf.t,v 0.1.1.1 2000/11/06 20:04:10 ram Exp $
 #
 #  Copyright (c) 2000, Raphael Manfredi
 #  
@@ -10,6 +10,9 @@
 #
 # HISTORY
 # $Log: badconf.t,v $
+# Revision 0.1.1.1  2000/11/06 20:04:10  ram
+# patch1: updated test to new logic
+#
 # Revision 0.1  2000/03/05 22:15:40  ram
 # Baseline for first alpha release.
 #
@@ -40,10 +43,17 @@ my $rotate_dflt = Log::Agent::Rotate->make(
     -max_size    => 100,
 );
 
+my $rotate_other = Log::Agent::Rotate->make(
+	-backlog     => 7,
+	-unzipped    => 1,
+	-is_alone    => 1,
+    -max_size    => 100,
+);
+
 my $driver = Log::Agent::Driver::File->make(
 	-rotate   => $rotate_dflt,
 	-channels => {
-		'error'  => ['t/logfile', 1],
+		'error'  => ['t/logfile', $rotate_other],
 		'output' => 't/logfile',
 	},
 );
@@ -56,7 +66,7 @@ logwarn $message;		# will bring logsize size > 100 chars
 
 ok 1, -e("t/logfile");
 ok 2, -e("t/logfile.0");
-ok 3, contains("t/logfile.0", "Rotation for 'error' may be wrong");
+ok 3, contains("t/logfile.0", "Rotation for 't/logfile' may be wrong");
 
 cleanlog;
 undef $Log::Agent::Driver;		# Cheat

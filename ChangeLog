@@ -1,3 +1,19 @@
+Mon Nov  6 21:06:22 MET 2000   Raphael Manfredi <Raphael_Manfredi@pobox.com>
+
+. Description:
+
+	Version 0.1.1.
+
+	Moved to an array representation for the config object.
+	Removed reference to driver and the ability to specify
+	-max_time in other units than seconds (e.g. "2d").
+
+	Added is_same() to compare rotation policies.
+
+	Added build_pm_hash() to compute PM value from MANIFEST.
+
+	Updated t/badconf.t to new detection logic within Log::Agent.
+
 Sun Mar  5 22:53:51 MET 2000 Raphael Manfredi <Raphael_Manfredi@pobox.com>
 
 . Description

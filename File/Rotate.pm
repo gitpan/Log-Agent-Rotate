@@ -1,5 +1,5 @@
 #
-# $Id: Rotate.pm,v 0.1 2000/03/05 22:15:40 ram Exp $
+# $Id: Rotate.pm,v 0.1.1.1 2000/11/06 19:57:24 ram Exp $
 #
 #  Copyright (c) 2000, Raphael Manfredi
 #  
@@ -8,6 +8,9 @@
 #  
 # HISTORY
 # $Log: Rotate.pm,v $
+# Revision 0.1.1.1  2000/11/06 19:57:24  ram
+# patch1: removed reference on driver
+#
 # Revision 0.1  2000/03/05 22:15:40  ram
 # Baseline for first alpha release.
 #
@@ -41,7 +44,6 @@ my $DEBUG = 0;
 # Attributes initialized by parameters:
 #    path     file path
 #    config   rotating configuration (a Log::Agent::Rotate object)
-#    driver   agent driver to whom we belong
 #
 # Other attributes:
 #    fd       currently opened file descriptor
@@ -57,10 +59,9 @@ my $DEBUG = 0;
 #
 sub make {
 	my $self = bless {}, shift;
-	my ($path, $config, $driver) = @_;
+	my ($path, $config) = @_;
 	$self->{'path'} = $path;
 	$self->{'config'} = $config;
-	$self->{'driver'} = $driver;
 	$self->{'fd'} = undef;
 	$self->{'handle'} = gensym;
 	$self->{'warned'} = {};
@@ -86,7 +87,6 @@ sub make {
 
 sub path		{ $_[0]->{'path'} }
 sub config		{ $_[0]->{'config'} }
-sub driver		{ $_[0]->{'driver'} }
 sub fd			{ $_[0]->{'fd'} }
 sub handle		{ $_[0]->{'handle'} }
 sub warned		{ $_[0]->{'warned'} }
@@ -144,7 +144,7 @@ sub print {
 	# Write to logfile
 	#
 
-	return unless syswrite($fd, $str);
+	return unless syswrite($fd, $str, length $str);
 
 	#
 	# If the overall logfile size is monitored, update it.
@@ -205,7 +205,7 @@ sub open {
 	warn "opening $path\n" if $DEBUG;
 
 	unless (sysopen($fd, $path, O_CREAT|O_APPEND|O_WRONLY)) {
-		warn $self->driver->prefix_msg("can't open logfile \"$path\": $!\n")
+		warn "$0: can't open logfile \"$path\": $!\n"
 			unless $self->warned->{$path}++;
 		return;
 	}
@@ -509,12 +509,10 @@ Its exported interface is:
 
 =over
 
-=item make I<file>, I<config>, I<driver>
+=item make I<file>, I<config>
 
-This is the creation routine. The I<driver> that owns the file is passed,
-so that we can properly prefix emergency log messages that could not go
-to the logfile I<file>, for instance if we cannot create it. The I<config>
-object is an instance of C<Log::Agent::Rotate>.
+This is the creation routine.  The I<config> object is an instance of
+C<Log::Agent::Rotate>.
 
 =item print I<args>
 
@@ -540,3 +538,4 @@ Raphael Manfredi F<E<lt>Raphael_Manfredi@pobox.comE<gt>>
 Log::Agent::Rotate(3), Log::Agent::Driver::File(3).
 
 =cut
+
