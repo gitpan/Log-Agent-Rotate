@@ -1,0 +1,13 @@
+README                           The main README file
+MANIFEST                         This list
+ChangeLog                        List of changes
+File/Rotate.pm                   A logfile capable of rotating itself
+Makefile.PL                      Generic Makefile template
+Rotate.pm                        File rotation parameters
+patchlevel.h                     Records the current patchlevel
+t/badconf.t                      Test error when bad rotation config
+t/code.pl                        Library for tests
+t/hole.t                         Test holes in logfile sequence
+t/mixed.t                        Test mixed rotation policy
+t/normal.t                       Test normal configuration
+t/rename.t                       Test behaviour with external logfile renaming
