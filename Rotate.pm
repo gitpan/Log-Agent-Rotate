@@ -59,7 +59,7 @@ use Getargs::Long qw(ignorecase);
 
 use vars qw($VERSION);
 
-$VERSION = sprintf "%d.%01d%02d%s", '$Name: rel0_1_4 $' =~ /(p?\d+)/g;
+$VERSION = sprintf "%d.%01d%02d%s", '$Name:  $' =~ /(p?\d+)/g;
 
 BEGIN {
     sub BACKLOG ()     {0}

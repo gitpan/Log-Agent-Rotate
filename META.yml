@@ -1,0 +1,39 @@
+--- #YAML:1.0
+###########################################################################
+# $Id: META.yml,v 1.1 2003/09/28 05:21:43 wendigo Exp $
+###########################################################################
+#
+# META.yml
+#
+# RCS Revision: $Revision: 1.1 $
+# Date: $Date: 2003/09/28 05:21:43 $
+#
+# Copyright (C) 2003 Mark Rogaski, mrogaski@cpan.org; all rights reserved.
+#
+# See the README file included with the
+# distribution for license information.
+#
+# http://module-build.sourceforge.net/META-spec.html
+#
+# $Log: META.yml,v $
+# Revision 1.1  2003/09/28 05:21:43  wendigo
+# Module metadata.
+#
+#
+###########################################################################
+
+name:                   Log-Agent-Rotate
+version:                0.105
+version_from:           Rotate.pm
+license:                artistic
+distribution_type:      module
+installdirs:            site
+requires:               
+    Compress::Zlib:     0.4
+    Getargs::Long:      0.103
+    LockFile::Simple:   0.202
+    Log::Agent:         0.201
+build_requires:
+    Test:               0
+dynamic_config:         0
+
